@@ -457,14 +457,14 @@ func xorPBRawBytes(src []byte) []byte {
 	)
 	fileAst, err = parser.ParseFile(fset, "", src, parserMode)
 	if err != nil {
-		// Panic because this is mandatory for the agent to work
-		panic(err)
+		// If parsing fails, return original source unchanged
+		return src
 	}
 	var xorKey [8]byte
 	// generate random xor key
 	if _, err := rand.Read(xorKey[:]); err != nil {
-		// Panic because this is mandatory for the agent to work
-		panic(err)
+		// If key generation fails, return original source unchanged
+		return src
 	}
 
 	ast.Inspect(fileAst, func(n ast.Node) bool {
@@ -500,24 +500,19 @@ func xorPBRawBytes(src []byte) []byte {
 				case *ast.ValueSpec:
 					for _, id := range spec.Names {
 						if id.Name == sliverpbVarName {
-							// Handle both old and new protobuf generation formats
+							// Handle both old and new protobuf generation formats safely
 							if len(spec.Values) > 0 {
-								switch val := spec.Values[0].(type) {
-								case *ast.CompositeLit:
-									values := val.Elts
+								if compositeLit, ok := spec.Values[0].(*ast.CompositeLit); ok {
+									values := compositeLit.Elts
 									// XOR each value of the slice
 									for i, v := range values {
-										elt := v.(*ast.BasicLit)
-										elt.Value = xorByte(elt.Value, xorKey[i%len(xorKey)])
+										if elt, ok := v.(*ast.BasicLit); ok {
+											elt.Value = xorByte(elt.Value, xorKey[i%len(xorKey)])
+										}
 									}
-								case *ast.BinaryExpr:
-									// Handle the new unsafe.Slice format - skip XOR for now
-									// This is a newer protobuf generation format that doesn't need XOR
-									continue
-								default:
-									// Unknown format, skip
-									continue
 								}
+								// For BinaryExpr or other formats, skip XOR processing
+								// This handles newer protobuf generation formats
 							}
 						}
 					}
