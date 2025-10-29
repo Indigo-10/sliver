@@ -467,6 +467,9 @@ func xorPBRawBytes(src []byte) []byte {
 		return src
 	}
 
+	// Track if we actually processed any protobuf data
+	processedProtobuf := false
+	
 	ast.Inspect(fileAst, func(n ast.Node) bool {
 		switch node := n.(type) {
 		// Look for the protobuf init function and decode the XORed
@@ -491,6 +494,7 @@ func xorPBRawBytes(src []byte) []byte {
 					},
 				}
 				node.Body.List = append([]ast.Stmt{newStmt}, node.Body.List...)
+				processedProtobuf = true
 			}
 
 		// Look for the protobuf rawDesc variable and XOR each byte
@@ -510,6 +514,7 @@ func xorPBRawBytes(src []byte) []byte {
 											elt.Value = xorByte(elt.Value, xorKey[i%len(xorKey)])
 										}
 									}
+									processedProtobuf = true
 								}
 								// For BinaryExpr or other formats, skip XOR processing
 								// This handles newer protobuf generation formats
@@ -523,6 +528,11 @@ func xorPBRawBytes(src []byte) []byte {
 		}
 		return true
 	})
+	
+	// Only add XOR function and variables if we actually processed protobuf data
+	if !processedProtobuf {
+		return src
+	}
 
 	// Add the XOR function to the AST
 	fileAst.Decls = append(fileAst.Decls, ast.Decl(&ast.FuncDecl{
