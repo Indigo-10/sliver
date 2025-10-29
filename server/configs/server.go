@@ -228,7 +228,7 @@ func getDefaultServerConfig() *ServerConfig {
 				},
 			},
 		},
-		DonutBypass: 3,
+		DonutBypass: 1,
 		CC:          map[string]string{},
 		CXX:         map[string]string{},
 	}
