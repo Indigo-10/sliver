@@ -500,12 +500,18 @@ func xorPBRawBytes(src []byte) []byte {
 				case *ast.ValueSpec:
 					for _, id := range spec.Names {
 						if id.Name == sliverpbVarName {
-							values := spec.Values[0].(*ast.CompositeLit).Elts
-							// XOR each value of the slice
-							for i, v := range values {
-								elt := v.(*ast.BasicLit)
-								elt.Value = xorByte(elt.Value, xorKey[i%len(xorKey)])
+							// Handle both old and new protobuf generation formats
+							if compositeLit, ok := spec.Values[0].(*ast.CompositeLit); ok {
+								values := compositeLit.Elts
+								// XOR each value of the slice
+								for i, v := range values {
+									if elt, ok := v.(*ast.BasicLit); ok {
+										elt.Value = xorByte(elt.Value, xorKey[i%len(xorKey)])
+									}
+								}
 							}
+							// For BinaryExpr or other formats, skip XOR processing
+							// This handles newer protobuf generation formats
 
 						}
 					}
