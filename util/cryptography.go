@@ -40,6 +40,22 @@ func RC4EncryptUnsafe(data []byte, key []byte) []byte {
 	return cipherText
 }
 
+// XOREncrypt - Simple XOR encryption
+func XOREncrypt(data []byte, key []byte) []byte {
+	if len(key) == 0 {
+		return data
+	}
+	
+	result := make([]byte, len(data))
+	keyLen := len(key)
+	
+	for i := 0; i < len(data); i++ {
+		result[i] = data[i] ^ key[i%keyLen]  // Repeats key if shorter than data
+	}
+	
+	return result
+}
+
 // PreludeEncrypt the results
 func PreludeEncrypt(data []byte, key []byte, iv []byte) []byte {
 	plainText, err := pad(data, aes.BlockSize)

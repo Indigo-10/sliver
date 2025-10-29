@@ -42,6 +42,7 @@ func StageListenerCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 	aesEncryptKey, _ := cmd.Flags().GetString("aes-encrypt-key")
 	aesEncryptIv, _ := cmd.Flags().GetString("aes-encrypt-iv")
 	rc4EncryptKey, _ := cmd.Flags().GetString("rc4-encrypt-key")
+	xorEncryptKey, _ := cmd.Flags().GetString("xor-encrypt-key")
 	compressF, _ := cmd.Flags().GetString("compress")
 	compress := strings.ToLower(compressF)
 
@@ -105,6 +106,15 @@ func StageListenerCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 		aesEncrypt = true
 	}
 
+	xorEncrypt := false
+	if xorEncryptKey != "" {
+		if len(xorEncryptKey) < 1 {
+			con.PrintErrorf("XOR key cannot be empty\n")
+			return
+		}
+		xorEncrypt = true
+	}
+
 	stage2, err := generate.GetSliverBinary(profile, con)
 	if err != nil {
 		con.PrintErrorf("%s\n", err)
@@ -125,6 +135,10 @@ func StageListenerCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 		fallthrough
 	case "deflate":
 		stage2 = util.DeflateBuf(stage2)
+	}
+
+	if xorEncrypt {
+		stage2 = util.XOREncrypt(stage2, []byte(xorEncryptKey))
 	}
 
 	if aesEncrypt {
@@ -170,6 +184,10 @@ func StageListenerCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 
 	if rc4Encrypt {
 		con.PrintInfof("RC4 KEY: %v\n", rc4EncryptKey)
+	}
+
+	if xorEncrypt {
+		con.PrintInfof("XOR KEY: %v\n", xorEncryptKey)
 	}
 }
 

@@ -177,6 +177,7 @@ func Commands(con *console.SliverClient) []*cobra.Command {
 		f.StringP("aes-encrypt-key", "k", "", "AES Encryption Key")
 		f.StringP("aes-encrypt-iv", "i", "", "AES Encryption IV")
 		f.StringP("rc4-encrypt-key", "r", "", "RC4 encryption key")
+		f.StringP("xor-encrypt-key", "x", "", "XOR encryption key")
 		f.BoolP("prepend-size", "p", false, "Prepend stage size")
 		f.StringP("compress", "c", "", "Compress stage (zlib, gzip, deflate9 or deflate)")
 	})

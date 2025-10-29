@@ -453,9 +453,10 @@ message GenerateStageReq {
   string AESEncryptKey = 3;
   string AESEncryptIv = 4;
   string RC4EncryptKey = 5;
-  bool PrependSize = 6;
-  string CompressF = 7;
-  string Compress = 8;
+  string XOREncryptKey = 6;
+  bool PrependSize = 7;
+  string CompressF = 8;
+  string Compress = 9;
 }
 
 message Generate { commonpb.File File = 1; }

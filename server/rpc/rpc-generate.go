@@ -801,6 +801,15 @@ func Encrypt(stage2 []byte, req *clientpb.GenerateStageReq) ([]byte, error) {
 	if req.RC4EncryptKey != "" && req.AESEncryptKey != "" {
 		return nil, errors.New("Cannot use both RC4 and AES encryption\n")
 	}
+	
+	// Apply XOR encryption first (if specified)
+	if req.XOREncryptKey != "" {
+		if len(req.XOREncryptKey) < 1 {
+			return nil, errors.New("XOR key cannot be empty\n")
+		}
+		stage2 = util.XOREncrypt(stage2, []byte(req.XOREncryptKey))
+	}
+	
 	if req.RC4EncryptKey != "" {
 		// RC4 keysize can be between 1 to 256 bytes
 		if len(req.RC4EncryptKey) < 1 || len(req.RC4EncryptKey) > 256 {

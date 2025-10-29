@@ -36,6 +36,7 @@ func ProfilesStageCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 	aesEncryptKey, _ := cmd.Flags().GetString("aes-encrypt-key")
 	aesEncryptIv, _ := cmd.Flags().GetString("aes-encrypt-iv")
 	rc4EncryptKey, _ := cmd.Flags().GetString("rc4-encrypt-key")
+	xorEncryptKey, _ := cmd.Flags().GetString("xor-encrypt-key")
 	prependSize, _ := cmd.Flags().GetBool("prepend-size")
 	compressF, _ := cmd.Flags().GetString("compress")
 	compress := strings.ToLower(compressF)
@@ -55,6 +56,7 @@ func ProfilesStageCmd(cmd *cobra.Command, con *console.SliverClient, args []stri
 		AESEncryptKey: aesEncryptKey,
 		AESEncryptIv:  aesEncryptIv,
 		RC4EncryptKey: rc4EncryptKey,
+		XOREncryptKey: xorEncryptKey,
 		PrependSize:   prependSize,
 		Compress:      compress,
 	})
