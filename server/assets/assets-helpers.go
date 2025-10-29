@@ -512,10 +512,10 @@ func xorPBRawBytes(src []byte) []byte {
 							case *ast.BinaryExpr:
 								// Handle the new unsafe.Slice format - skip XOR for now
 								// This is a newer protobuf generation format that doesn't need XOR
-								continue
+								// No action needed for this format
 							default:
 								// Unknown format, skip
-								continue
+								// No action needed for unknown formats
 							}
 						}
 					}
